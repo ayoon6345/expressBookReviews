@@ -51,20 +51,25 @@ public_users.get('/',async function (req, res) {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',async function (req, res) {
-  try {
+public_users.get('/isbn/:isbn',function (req, res) {
+
+  const getIsbnPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        const data = books;
+        resolve(data);
+    }, 6000);
+  });
+  getIsbnPromise.then((bookData) => {
     let isbn = req.params.isbn;
-    const data = await books;
-    let filtered_isbn = Object.values(data).filter(book => book.isbn.includes(isbn));
+    let filtered_isbn = Object.values(bookData).filter(book => book.isbn.includes(isbn));
     if(filtered_isbn.length === 0){
       return res.status(404).json({message: "Book with "+ filtered_isbn + " does not exist"});
     }
     res.send(JSON.stringify(filtered_isbn, null, 4));
-       }
-    catch (error) {
-      console.error(error.toString());
-      res.status(500).json({ error: 'Internal Server Error' });
-   }
+  }).catch((error) => {
+    console.error(error.toString());
+    res.status(500).json({ error: 'Internal Server Error' });
+  });
 
 
  });
